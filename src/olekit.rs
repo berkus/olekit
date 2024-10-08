@@ -20,7 +20,7 @@ use ole;
 
 
 pub(crate) fn olekit(all_matches: &clap::ArgMatches)
-      -> Result<(), std::boxed::Box<std::error::Error>> {
+      -> Result<(), std::boxed::Box<dyn std::error::Error>> {
 
   // ls
   if let Some(matches) = all_matches.subcommand_matches("ls") {
@@ -32,7 +32,7 @@ pub(crate) fn olekit(all_matches: &clap::ArgMatches)
     let more_details = matches.is_present("details");
     let idirid = matches.is_present("idirid");
     let full_path = matches.is_present("full-path");
-    let formatter: Box<super::format::Formatter>;
+    let formatter: Box<dyn super::format::Formatter>;
 
     formatter = Box::new(super::format::DetailsFormatter {
         human: human,
