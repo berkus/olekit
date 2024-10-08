@@ -184,7 +184,7 @@ checksum = "4f0add6eeb62fdaf7afd332d52763f27d365cfd047f95e232671532c1efb3a66"
 
 [[package]]
 name = "olekit"
-version = "1.0.2"
+version = "1.0.3"
 dependencies = [
  "ansi_term 0.11.0",
  "chrono",

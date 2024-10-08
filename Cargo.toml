@@ -1,18 +1,21 @@
 [package]
 name = "olekit"
-version = "1.0.2"
-authors = ["Thomas BAILLEUX <thomas@bailleux.me>"]
+version = "1.0.3"
+authors = [
+    "Thomas BAILLEUX <thomas@bailleux.me>",
+    "Berkus Decker <berkus+crates@madfire.net>",
+]
 license = "WTFPL"
 description = "A simple command line tool for working with OLE container files"
-homepage = "https://github.com/zadlg/olekit"
+homepage = "https://github.com/berkus/olekit"
 keywords = ["ole", "compound", "document", "file", "parser"]
 categories = ["parsing"]
-repository = "https://github.com/zadlg/olekit.git"
+repository = "https://github.com/berkus/olekit.git"
 readme = "README.md"
 edition = "2021"
 
 [dependencies]
-ole = "0.1.13"
+ole = "0.1.15"
 clap = "2.31.1"
 ansi_term = "0.11.0"
 chrono = "0.4.0"
