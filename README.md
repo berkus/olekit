@@ -15,63 +15,54 @@ cargo install olekit
 
 ```bash
 $ olekit --help
-OLEkit 1.0.1
-A simple command line tool for working with OLE file
+Usage: olekit <command> [<args>]
 
-USAGE:
-    olekit [SUBCOMMAND]
+OLEkit.
 
-FLAGS:
-    -h, --help       Prints help information
-    -V, --version    Prints version information
+Options:
+  --help            display usage information
 
-SUBCOMMANDS:
-    cat     Concatenate entries and print on the standard output
-    help    Prints this message or the help of the given subcommand(s)
-    ls      List OLE file entries
+Commands:
+  ls                List OLE file entries.
+  cat               Concatenate entries and print on the standard output.
 ```
 
 ### How to list entries: `ls` command
 
 ```bash
-$ olekit help ls
-olekit-ls
-List OLE file entries
+$ olekit ls --help
+Usage: olekit ls <file> [-h] [-s] [-c] [-d] [-i] [-f]
 
-USAGE:
-    olekit ls [FLAGS] <FILE>
+List OLE file entries.
 
-FLAGS:
-        --color             colorize the output
-    -d, --details           print more details for each entry
-    -f, --full-path         print the full path of each entry
-        --help              Prints help information
-    -h, --human-readable    with -l and -s, print sizes like 1K 234M 2G etc.
-    -i, --idirid            print the index number of each file
-    -s, --size              print the allocated size of each file, in blocks
-    -V, --version           Prints version information
+Positional Arguments:
+  file              an OLE file to analyze
 
-ARGS:
-    <FILE>    OLE file to analyze
+Options:
+  -h, --human-readable
+                    with -l and --size, print sizes like 1K 234M 2G etc.
+  -s, --size        print the allocated size of each file, in blocks
+  -c, --color       colorize the output
+  -d, --details     print more details for each entry
+  -i, --idirid      print the index number of each file
+  -f, --full-path   print the full path of each entry
+  --help            display usage information
 ```
 
 ### How to extract entry content: `cat` command
 
 ```bash
-$ olekit help cat
-olekit-cat
-Concatenate entries and print on the standard output
+$ olekit cat --help
+Usage: olekit cat <file> [<ids...>]
 
-USAGE:
-    olekit cat <FILE> <ID>...
+Concatenate entries and print on the standard output.
 
-FLAGS:
-    -h, --help       Prints help information
-    -V, --version    Prints version information
+Positional Arguments:
+  file              an OLE file to analyze
+  ids               IDs of the entries
 
-ARGS:
-    <FILE>     OLE file to analyze
-    <ID>...    IDs of the entries
+Options:
+  --help            display usage information
 ```
 
 ## License
