@@ -14,8 +14,8 @@
 //
 // Author: zadig <thomas chr(0x40) bailleux.me>
 
-
-#![derive(Debug, Clone, Copy)]
+#![derive(Debug, Clone, Copy, thiserror::Error)]
 pub(crate) enum Error {
-  CannotOpenFile
+    #[error("Couldn't open file")]
+    CannotOpenFile,
 }
