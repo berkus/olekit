@@ -14,10 +14,9 @@
 //
 // Author: zadig <thomas chr(0x40) bailleux.me>
 
-use std;
-use ole;
 use ansi_term;
-use chrono;
+use jiff::{fmt::rfc2822::DateTimePrinter, Timestamp};
+use ole;
 
 const DIF_TIME_WINDOWS: u64 = 116444736000000000u64;
 
@@ -64,18 +63,22 @@ pub(crate) trait Formatter {
     }
   }
 
-  fn format_date(&self, date: u64) -> std::string::String {
-    use chrono::TimeZone;
-    let result: std::string::String;
-    if date == 0 {
-      result = std::string::String::from("(no MAC specified)");
-    } else {
-      result = chrono::Utc.timestamp(((date - DIF_TIME_WINDOWS)
-          / 10000000) as i64, 0).format("%Y-%m-%d %H:%M:%S").to_string();
     }
 
-    result
   }
+    fn format_date(&self, date: u64) -> String {
+        if date == 0 {
+            "(no date specified)".into()
+        } else {
+            Timestamp::from_second(((date - DIF_TIME_WINDOWS) / 10000000) as i64).map_or_else(
+                |_| "(date not valid)".into(),
+                |t| {
+                    DateTimePrinter::new()
+                        .timestamp_to_string(&t)
+                        .unwrap_or("(failed to format date)".into())
+                },
+            )
+        }
 
 	fn print_entries(&self, entries: std::vec::Vec<&ole::Entry>) {
 		let mut total_size = 0u64;
