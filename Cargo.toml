@@ -17,7 +17,7 @@ edition = "2021"
 [dependencies]
 ole = "0.1.15"
 clap = "2.31.1"
-ansi_term = "0.11.0"
+ansi_term = "0.12"
 thiserror = "1.0.64"
 jiff = "0.1.13"
 humansize = "2.1.3"
