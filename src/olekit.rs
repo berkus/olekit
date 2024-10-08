@@ -31,16 +31,15 @@ pub(crate) fn olekit(
         let more_details = matches.is_present("details");
         let idirid = matches.is_present("idirid");
         let full_path = matches.is_present("full-path");
-        let formatter: Box<dyn super::format::Formatter>;
 
-        formatter = Box::new(super::format::DetailsFormatter {
-            human: human,
-            size: size,
-            color: color,
-            more_details: more_details,
-            idirid: idirid,
-            full_path: full_path,
-        });
+        let formatter = crate::format::Formatter {
+            human,
+            size,
+            color,
+            more_details,
+            idirid,
+            full_path,
+        };
 
         formatter.print_entries(parser.iterate().collect());
     }
