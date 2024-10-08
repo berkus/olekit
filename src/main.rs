@@ -13,90 +13,71 @@
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 //
 // Author: zadig <thomas chr(0x40) bailleux.me>
+use argh::FromArgs;
 
 mod format;
 mod olekit;
 
+#[derive(FromArgs, PartialEq, Debug)]
+/// OLEkit.
+struct TopLevel {
+    #[argh(subcommand)]
+    nested: SubCommandEnum,
+}
+
+#[derive(FromArgs, PartialEq, Debug)]
+#[argh(subcommand)]
+enum SubCommandEnum {
+    Ls(SubCommandLs),
+    Cat(SubCommandCat),
+}
+
+#[derive(FromArgs, PartialEq, Debug)]
+/// List OLE file entries.
+#[argh(subcommand, name = "ls")]
+pub(crate) struct SubCommandLs {
+    /// with -l and --size, print sizes like 1K 234M 2G etc.
+    #[argh(switch, short = 'h', long = "human-readable")]
+    human: bool,
+    /// print the allocated size of each file, in blocks
+    #[argh(switch, short = 's')]
+    size: bool,
+    /// colorize the output
+    #[argh(switch, short = 'c')]
+    color: bool,
+    /// print more details for each entry
+    #[argh(switch, short = 'd')]
+    details: bool,
+    /// print the index number of each file
+    #[argh(switch, short = 'i')]
+    idirid: bool,
+    /// print the full path of each entry
+    #[argh(switch, short = 'f')]
+    full_path: bool,
+    /// an OLE file to analyze
+    #[argh(positional)]
+    file: String,
+}
+
+#[derive(FromArgs, PartialEq, Debug)]
+/// Concatenate entries and print on the standard output.
+#[argh(subcommand, name = "cat")]
+pub(crate) struct SubCommandCat {
+    /// an OLE file to analyze
+    #[argh(positional)]
+    file: String,
+    /// IDs of the entries
+    #[argh(positional)]
+    ids: Vec<usize>,
+}
+
 fn main() {
-    let matches = clap::App::new("OLEkit")
-        .version(env!("CARGO_PKG_VERSION"))
-        .about(env!("CARGO_PKG_DESCRIPTION"))
-        .subcommand(
-            clap::SubCommand::with_name("ls")
-                .about("List OLE file entries")
-                .arg(
-                    clap::Arg::with_name("FILE")
-                        .help("OLE file to analyze")
-                        .required(true)
-                        .index(1),
-                )
-                .arg(
-                    clap::Arg::with_name("human")
-                        .short("h")
-                        .long("human-readable")
-                        .required(false)
-                        .takes_value(false)
-                        .help("with -l and -s, print sizes like 1K 234M 2G etc."),
-                )
-                .arg(
-                    clap::Arg::with_name("size")
-                        .short("s")
-                        .long("size")
-                        .required(false)
-                        .takes_value(false)
-                        .help("print the allocated size of each file, in blocks"),
-                )
-                .arg(
-                    clap::Arg::with_name("color")
-                        .long("color")
-                        .required(false)
-                        .takes_value(false)
-                        .help("colorize the output"),
-                )
-                .arg(
-                    clap::Arg::with_name("details")
-                        .short("d")
-                        .long("details")
-                        .required(false)
-                        .takes_value(false)
-                        .help("print more details for each entry"),
-                )
-                .arg(
-                    clap::Arg::with_name("idirid")
-                        .short("i")
-                        .long("idirid")
-                        .required(false)
-                        .takes_value(false)
-                        .help("print the index number of each file"),
-                )
-                .arg(
-                    clap::Arg::with_name("full-path")
-                        .short("f")
-                        .long("full-path")
-                        .required(false)
-                        .takes_value(false)
-                        .help("print the full path of each entry"),
-                ),
-        )
-        .subcommand(
-            clap::SubCommand::with_name("cat")
-                .about("Concatenate entries and print on the standard output")
-                .arg(
-                    clap::Arg::with_name("FILE")
-                        .help("OLE file to analyze")
-                        .required(true)
-                        .index(1),
-                )
-                .arg(
-                    clap::Arg::with_name("ID")
-                        .help("IDs of the entries")
-                        .required(true)
-                        .index(2)
-                        .min_values(1),
-                ),
-        )
-        .get_matches();
-    match olekit::olekit(&matches) {
+    let args: TopLevel = argh::from_env();
+
+    match match args.nested {
+        SubCommandEnum::Ls(ls) => olekit::ls(&ls),
+        SubCommandEnum::Cat(cat) => olekit::cat(&cat),
+    } {
         Err(e) => eprintln!("An error has occured: {}", e),
         _ => {}
     };

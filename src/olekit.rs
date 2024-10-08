@@ -14,64 +14,47 @@
 //
 // Author: zadig <thomas chr(0x40) bailleux.me>
 
-use clap;
+use crate::{SubCommandCat, SubCommandLs};
 use ole;
-use std;
 
-pub(crate) fn olekit(
-    all_matches: &clap::ArgMatches,
-) -> Result<(), std::boxed::Box<dyn std::error::Error>> {
-    // ls
-    if let Some(matches) = all_matches.subcommand_matches("ls") {
-        let file = matches.value_of("FILE").unwrap();
-        let parser = ole::Reader::from_path(file)?;
-        let human = matches.is_present("human");
-        let size = matches.is_present("size");
-        let color = matches.is_present("color");
-        let more_details = matches.is_present("details");
-        let idirid = matches.is_present("idirid");
-        let full_path = matches.is_present("full-path");
+pub(crate) fn ls(ls: &SubCommandLs) -> Result<(), Box<dyn std::error::Error>> {
+    let parser = ole::Reader::from_path(&ls.file)?;
 
-        let formatter = crate::format::Formatter {
-            human,
-            size,
-            color,
-            more_details,
-            idirid,
-            full_path,
-        };
+    let formatter = crate::format::Formatter {
+        human: ls.human,
+        size: ls.size,
+        color: ls.color,
+        more_details: ls.details,
+        idirid: ls.idirid,
+        full_path: ls.full_path,
+    };
 
-        formatter.print_entries(parser.iterate().collect());
-    }
-    // cat
-    else if let Some(matches) = all_matches.subcommand_matches("cat") {
-        let file = matches.value_of("FILE").unwrap();
-        let parser = ole::Reader::from_path(file)?;
-        let entries: std::vec::Vec<&ole::Entry> = parser.iterate().collect();
-        let files: std::vec::Vec<&str> = matches.values_of("ID").unwrap().collect();
-        for sid in files {
-            if let Ok(id) = sid.parse::<usize>() {
-                if id < entries.len() {
-                    let entry = entries[id];
-                    let mut buf = std::vec::Vec::<u8>::new();
-                    if let Ok(mut slice) = parser.get_entry_slice(entry) {
-                        use std::io::{Read, Write};
-                        match slice.read_to_end(&mut buf) {
-                            Ok(_n) => {
-                                std::io::stdout().write_all(&buf)?;
-                                std::io::stdout().flush()?;
-                            }
-                            Err(e) => eprintln!("Can't print entry {}: {}", id, e),
-                        }
-                    } else {
-                        eprintln!("Can't print entry {}.", id);
+    formatter.print_entries(parser.iterate().collect());
+    Ok(())
+}
+
+pub(crate) fn cat(cat: &SubCommandCat) -> Result<(), Box<dyn std::error::Error>> {
+    let parser = ole::Reader::from_path(&cat.file)?;
+    let entries: Vec<&ole::Entry> = parser.iterate().collect();
+
+    for &id in &cat.ids {
+        if id < entries.len() {
+            let entry = entries[id];
+            let mut buf = Vec::<u8>::new();
+            if let Ok(mut slice) = parser.get_entry_slice(entry) {
+                use std::io::{Read, Write};
+                match slice.read_to_end(&mut buf) {
+                    Ok(_n) => {
+                        std::io::stdout().write_all(&buf)?;
+                        std::io::stdout().flush()?;
                     }
-                } else {
-                    eprintln!("Entry {} doesn't exist", id);
+                    Err(e) => eprintln!("Can't print entry {}: {}", id, e),
                 }
             } else {
-                eprintln!("Invalid entry id: {}", sid);
+                eprintln!("Can't get entry {}.", id);
             }
+        } else {
+            eprintln!("Entry {} doesn't exist", id);
         }
     }
     Ok(())
